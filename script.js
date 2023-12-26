@@ -1,6 +1,7 @@
 // get dom elements
 const matchContainerEl = document.getElementById("match-container");
 const addMatchBtn = document.getElementById("add-match");
+const resetEl = document.getElementById("reset");
 const numberEl = document.getElementsByClassName("number");
 const incrementFormEl = document.getElementsByClassName("incrementForm");
 const incrementFormArray = Array.from(incrementFormEl);
@@ -19,6 +20,7 @@ const initialState = [
 const INCREMENT = "increment";
 const DECREMENT = "decrement";
 const ADDNEWFIELD = "addNewField";
+const RESET = "reset";
 
 //action creator
 const increment = (value, id) => {
@@ -52,6 +54,11 @@ const matchTotalReducer = (state = initialState, action) => {
         };
       }
       return { ...element };
+    });
+    return newState;
+  } else if (action.type == RESET) {
+    const newState = state.map((element) => {
+      return { ...element, value: 120 };
     });
     return newState;
   } else {
@@ -141,5 +148,11 @@ decrementFormArray.forEach((element) => {
     e.preventDefault();
     e.stopImmediatePropagation();
     store.dispatch(decrement(parseInt(element.decrement.value), 0));
+  });
+});
+
+resetEl.addEventListener("click", () => {
+  store.dispatch({
+    type: RESET,
   });
 });
