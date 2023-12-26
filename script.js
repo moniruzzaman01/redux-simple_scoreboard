@@ -11,40 +11,45 @@ const decrementFormArray = Array.from(decrementFormEl);
 const initialState = [
   {
     id: 0,
-    value: 110,
+    value: 120,
   },
 ];
 
+//action identifier
+const INCREMENT = "increment";
+const DECREMENT = "decrement";
+const ADDNEWFIELD = "addNewField";
+
 //action creator
 const increment = (value, id) => {
-  return { type: "increment", payload: { value, id } };
+  return { type: INCREMENT, payload: { value, id } };
 };
 const decrement = (value, id) => {
-  return { type: "decrement", payload: { value, id } };
+  return { type: DECREMENT, payload: { value, id } };
 };
 
 //reducer function
 const matchTotalReducer = (state = initialState, action) => {
-  if (action.type == "addNewField") {
-    return [
-      ...state,
-      { id: state.length, value: state[0].value + state.length },
-    ];
-  } else if (action.type == "increment") {
-    // console.log("inc", state, action);
+  if (action.type == ADDNEWFIELD) {
+    return [...state, { id: state.length, value: 120 }];
+  } else if (action.type == INCREMENT) {
     const newState = state.map((element) => {
       if (element.id == action.payload.id) {
-        return { ...element, value: 10 };
+        return { ...element, value: element.value + action.payload.value };
       }
       return { ...element };
     });
-    console.log(newState);
     return newState;
-  } else if (action.type == "decrement") {
-    // console.log("dec");
+  } else if (action.type == DECREMENT) {
     const newState = state.map((element) => {
       if (element.id == action.payload.id) {
-        return { ...element, value: 20 };
+        return {
+          ...element,
+          value:
+            element.value < action.payload.value
+              ? 0
+              : element.value - action.payload.value,
+        };
       }
       return { ...element };
     });
@@ -60,7 +65,6 @@ const store = Redux.createStore(matchTotalReducer);
 //render function
 const render = () => {
   const state = store.getState();
-  console.log("state", state);
   const numberElArray = Array.from(numberEl);
   numberElArray.forEach((element, i) => {
     element.innerText = state[i].value;
@@ -106,8 +110,7 @@ addMatchBtn.addEventListener("click", () => {
     element.addEventListener("submit", (e) => {
       e.preventDefault();
       e.stopImmediatePropagation();
-      //   console.log(e.target.increment.value);
-      store.dispatch(increment(10, i));
+      store.dispatch(increment(parseInt(element.increment.value), i));
     });
   });
   //get new added element and add event listener for decrement form
@@ -117,24 +120,19 @@ addMatchBtn.addEventListener("click", () => {
     element.addEventListener("submit", (e) => {
       e.preventDefault();
       e.stopImmediatePropagation();
-      //   console.log(e.target.decrement.value);
-      store.dispatch(decrement(5, i));
+      store.dispatch(decrement(parseInt(element.decrement.value), i));
     });
   });
   store.dispatch({
-    type: "addNewField",
+    type: ADDNEWFIELD,
   });
-  //   const newNumberEl = document.getElementsByClassName("number");
-  //   const newNumberElArray = Array.from(newNumberEl);
-  //   console.log(newNumberElArray);
 });
 //event listener for initial increment form
 incrementFormArray.forEach((element) => {
   element.addEventListener("submit", (e) => {
     e.preventDefault();
     e.stopImmediatePropagation();
-    // console.log(e.target.increment.value);
-    store.dispatch(increment(10, 0));
+    store.dispatch(increment(parseInt(element.increment.value), 0));
   });
 });
 //event listener for initial decrement form
@@ -142,7 +140,6 @@ decrementFormArray.forEach((element) => {
   element.addEventListener("submit", (e) => {
     e.preventDefault();
     e.stopImmediatePropagation();
-    // console.log(e.target.decrement.value);
-    store.dispatch(decrement(5, 0));
+    store.dispatch(decrement(parseInt(element.decrement.value), 0));
   });
 });
